@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"log"
+	"os"
 	str "strings"
 )
 
@@ -35,15 +35,22 @@ func filepathToString(path string) string {
 	return builder.String()
 }
 
-func markdownToHtml(md string) {
+func markdownToHtml(md string) string {
+	var builder str.Builder
 	lines := str.Split(md, "\n")
 	for _, line := range lines {
 		if str.HasPrefix(line, "#") {
 			hashcount := str.Count(line, "#")
-			title := line[hashcount+1:len(line)]
-			fmt.Printf("<h%d>%s</h%d>\n", hashcount, title, hashcount)
+			title := line[hashcount+1 : len(line)]
+			builder.WriteString(fmt.Sprintf("<h%d>%s</h%d>", hashcount, title, hashcount))
+			builder.WriteByte('\n')
+		} else {
+			builder.WriteString(line)
+			builder.WriteByte('\n')
 		}
 	}
+	s := builder.String()
+	return s[:len(s)-1]
 }
 
 func main() {
@@ -72,6 +79,7 @@ func main() {
 		builder.WriteString(path)
 		filepath := builder.String()
 		data := filepathToString(filepath)
-		markdownToHtml(data)
+		html := markdownToHtml(data)
+		fmt.Printf("%s", html)
 	}
 }
